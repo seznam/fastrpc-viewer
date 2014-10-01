@@ -1,5 +1,5 @@
 PROJECT="fastrpc"
-VERSION="0.5"
+VERSION="0.6"
 
 CURRENT_DIR=`pwd`
 BUILD_DIR="build"

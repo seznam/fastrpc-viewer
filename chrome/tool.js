@@ -43,24 +43,24 @@ function startup(_toolbox, _target) {
   toolbox.selectTool("webconsole").then(function(webconsole) {
 
 	  var consoleEvent = {
-	    ID: "jsm",
-	    level: "log",
-	    filename: "x",
-	    lineNumber: "y",
-	    functionName: "z",
-	    timeStamp: Date.now(),
-	    arguments: ["aaaaa", "bbbb"]
+		ID: "jsm",
+		level: "log",
+		filename: "x",
+		lineNumber: "y",
+		functionName: "z",
+		timeStamp: Date.now(),
+		arguments: ["aaaaa", "bbbb"]
 	  };
 
 	  consoleEvent.wrappedJSObject = consoleEvent;
 
-  	webconsole.hud.ui.logConsoleAPIMessage(consoleEvent);
+	webconsole.hud.ui.logConsoleAPIMessage(consoleEvent);
   });
 */
 
   target.client.attachConsole(target.form.consoleActor, ["NetworkActivity"], function(response, _webConsoleClient) {
-  	webConsoleClient = _webConsoleClient;
-  	var prefs = { "NetworkMonitor.saveRequestAndResponseBodies": true };
+	webConsoleClient = _webConsoleClient;
+	var prefs = { "NetworkMonitor.saveRequestAndResponseBodies": true };
 	webConsoleClient.setPreferences(prefs, function() {
 		target.client.addListener("networkEvent", onNetworkEvent);
 		target.client.addListener("networkEventUpdate", onNetworkEventUpdate);
@@ -136,6 +136,16 @@ function onResponseHeaders(data) {
 
 function onResponseContent(data) {
 	var item = Item.ALL[data.from];
-	item && item.setResponseData(data.content.text);
+	var text = data.content.text;
+	if (typeof(text) == "object") {
+		var initial = text.initial;
+		var longString = webConsoleClient.longString(text);
+		longString.substring(initial.length, text.length, function(response) {
+			text = initial + response.substring;
+			item && item.setResponseData(text);
+		});
+	} else {
+		item && item.setResponseData(text);
+	}
 }
 
