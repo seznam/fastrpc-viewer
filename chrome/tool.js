@@ -121,7 +121,18 @@ function onRequestHeaders(data) {
 
 function onRequestPostData(data) {
 	var item = Item.ALL[data.from];
-	item && item.setRequestData(data.postData.text);
+	var text = data.postData.text;
+
+	if (typeof(text) == "object") {
+		var initial = text.initial;
+		var longString = webConsoleClient.longString(text);
+		longString.substring(initial.length, text.length, function(response) {
+			text = initial + response.substring;
+			item && item.setRequestData(text);
+		});
+	} else {
+		item && item.setRequestData(text);
+	}
 }
 
 function onResponseStart(data) {
