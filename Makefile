@@ -1,5 +1,5 @@
-PROJECT="my-addon"
-VERSION="0.1"
+PROJECT="fastrpc"
+VERSION="0.5"
 
 CURRENT_DIR=`pwd`
 BUILD_DIR="build"

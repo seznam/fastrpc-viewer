@@ -4,8 +4,8 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
 <!DOCTYPE window [
-  <!ENTITY % MyAddonDTD SYSTEM "chrome://my-addon/locale/strings.dtd">
-   %MyAddonDTD;
+  <!ENTITY % FastRPCDTD SYSTEM "chrome://fastrpc/locale/strings.dtd">
+   %FastRPCDTD;
 ]>
 
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -14,15 +14,44 @@
   <head>
     <link rel="stylesheet" href="chrome://browser/skin/"/>
     <link rel="stylesheet" href="chrome://browser/skin/devtools/common.css"/>
-    <link rel="stylesheet" href="chrome://my-addon/skin/style.css"/>
+    <link rel="stylesheet" href="chrome://fastrpc/skin/style.css"/>
 
     <xul:script src="chrome://browser/content/devtools/theme-switching.js"/>
     <xul:script src="tool.js"/>
+    <xul:script src="item.js"/>
+    <xul:script src="jak.js"/>
+    <xul:script src="base64.js"/>
+    <xul:script src="frpc.js"/>
   </head>
 
+  <style>
+    tr { display:table-row; }
+    td { display:table-cell; padding:2px 3px;}
+    td:nth-child(2), td:nth-child(3), td:nth-child(4), button {
+      text-align: center;
+    }
+    button {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+
   <body>
-    <p>&MyAddonUI.label;</p>
-    <p id="hello"></p>
+    <table>
+      <thead>
+        <tr>
+          <th>URL</th>
+          <th>Method</th>
+          <th>HTTP status</th>
+          <th>FRPC status</th>
+          <th>Arguments</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button>Clear</button>
   </body>
 
 </html>

@@ -5,10 +5,10 @@
 /* Go to https://developer.mozilla.org/docs/Tools/DevToolsColors
  * for the default colors used in Firefox Developer Tools */
 
-.theme-dark body > p {
-  color: #f5f7fa;
+.theme-dark body {
+	color: #F5F7FA;
 }
 
-.theme-light body > p {
-  color: #ed2655;
+.theme-light body {
+	color: #3C3C3C;
 }

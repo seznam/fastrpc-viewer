@@ -22,7 +22,7 @@ XPCOMUtils.defineLazyGetter(this, "osString", () =>
  * Go to https://developer.mozilla.org/docs/Localization for more information.
  */
 XPCOMUtils.defineLazyGetter(this, "toolStrings", () =>
-  Services.strings.createBundle("chrome://my-addon/locale/strings.properties"));
+  Services.strings.createBundle("chrome://fastrpc/locale/strings.properties"));
 
 /**
  * `toolDefinition` is an object defining metadata about this add-on.
@@ -30,28 +30,30 @@ XPCOMUtils.defineLazyGetter(this, "toolStrings", () =>
  */
 XPCOMUtils.defineLazyGetter(this, "toolDefinition", () => ({
   // A unique id. Must not contain whitespace.
-  id: "my-addon",
+  id: "fastrpc",
 
   // The position of the tool's tab within the toolbox
   ordinal: 99,
 
   // Main keybinding key (used as a keyboard shortcut).
-  key: toolStrings.GetStringFromName("MyAddon.commandkey"),
+  key: toolStrings.GetStringFromName("FastRPC.commandkey"),
 
   // Main keybinding modifiers.
   modifiers: osString == "Darwin" ? "accel,alt" : "accel,shift",
 
   // The url of the icon, displayed in the Toolbox.
-  icon: "chrome://my-addon/skin/icon.png",
+  icon: "chrome://browser/skin/devtools/tool-network.svg",
 
   // A tool lives in its own iframe. The Toolbox will load this URL.
-  url: "chrome://my-addon/content/tool.xul",
+  url: "chrome://fastrpc/content/tool.xul",
 
   // The tool's name. Showed in Firefox' tool menu and in the Toolbox' tab.
-  label: toolStrings.GetStringFromName("MyAddon.label"),
+  label: toolStrings.GetStringFromName("FastRPC.label"),
 
   // The tooltip text shown in the Toolbox's tab.
-  tooltip: toolStrings.GetStringFromName("MyAddon.tooltip"),
+  tooltip: toolStrings.GetStringFromName("FastRPC.tooltip"),
+
+  invertIconForLightTheme: true,
 
   // If the target is not supported, the toolbox will hide the tab.
   // Targets can be local or remote (used in remote debugging).
@@ -62,8 +64,8 @@ XPCOMUtils.defineLazyGetter(this, "toolDefinition", () => ({
   // This function is called when the user select the tool tab.
   // It is called only once the toold definition's URL is loaded.
   build: function(iframeWindow, toolbox) {
-    Cu.import("chrome://my-addon/content/panel.js");
-    let panel = new MyAddonPanel(iframeWindow, toolbox);
+    Cu.import("chrome://fastrpc/content/panel.js");
+    let panel = new FastRPCPanel(iframeWindow, toolbox);
     return panel.open();
   }
 }));
