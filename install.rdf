@@ -21,7 +21,7 @@
     <em:creator>Ondřej Žára</em:creator>
 
     <!-- A link to the add-on home page to display in the user interface. -->
-    <em:homepageURL>http://mozilla.org</em:homepageURL>
+    <em:homepageURL>https://github.com/seznam/fastrpc-viewer</em:homepageURL>
 
     <!-- Target Application this extension can install into,
          with minimum and maximum supported versions. -->
@@ -30,7 +30,7 @@
         <!-- Mozilla Firefox -->
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>29.0a1</em:minVersion>
-        <em:maxVersion>99.0a1</em:maxVersion>
+        <em:maxVersion>48.0</em:maxVersion>
       </Description>
     </em:targetApplication>
 
@@ -39,6 +39,5 @@
 
     <!-- Tells the application whether the extension is boot-strappable. -->
     <em:bootstrap>true</em:bootstrap>
-
   </Description>
 </RDF>

@@ -29,7 +29,7 @@ XPCOMUtils.defineLazyGetter(this, "toolDefinition", () => ({
 
 
   // The url of the icon, displayed in the Toolbox.
-  icon: "chrome://browser/skin/devtools/tool-network.svg",
+  icon: "chrome://devtools/skin/images/tool-network.svg",
 
   // A tool lives in its own iframe. The Toolbox will load this URL.
   url: "chrome://fastrpc/content/tool.xhtml",

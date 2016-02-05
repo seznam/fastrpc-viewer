@@ -34,14 +34,11 @@ Item.prototype.setRequestHeaders = function(headers) {
 Item.prototype.setRequestData = function(data) {
 	try {
 		var type = this._getHeaderValue(this._requestHeaders, "Content-type");
-		if (type.indexOf("base64") > -1) {
-			var binary = JAK.Base64.atob(data);
-		} else {
-			var binary = data.split("").map(function(ch) { return ch.charCodeAt(0); })
-		}
-		var result = JAK.FRPC.parse(binary);
+		if (type.indexOf("base64") > -1) { data = atob(data); }
+		var binary = data.split("").map(function(ch) { return ch.charCodeAt(0); })
+		var result = FRPC.parse(binary);
 
-		this._cells[1].innerHTML = result.method;
+		this._cells[1].appendChild(document.createTextNode(result.method));
 
 		this._params = result.params;
 
@@ -51,12 +48,12 @@ Item.prototype.setRequestData = function(data) {
 		button.addEventListener("click", this._showParams.bind(this));
 
 	} catch (e) {
-		this._cells[4].innerHTML = "(" + e.message + ")";
+		this._cells[4].appendChild(document.createTextNode("(" + e.message + ")"));
 	}
 }
 
 Item.prototype.setResponseStatus = function(status) {
-	this._cells[2].innerHTML = status;
+	this._cells[2].appendChild(document.createTextNode(status));
 }
 
 Item.prototype.setResponseHeaders = function(headers) {
@@ -68,14 +65,11 @@ Item.prototype.setResponseData = function(data) {
 		var type = this._getHeaderValue(this._responseHeaders, "Content-type");
 		var decoded = atob(data); // brain-damaged ff re-encodes in base64...
 
-		if (type.indexOf("base64") > -1) {
-			var binary = JAK.Base64.atob(decoded);
-		} else {
-			var binary = decoded.split("").map(function(ch) { return ch.charCodeAt(0); })
-		}
-		this._response = JAK.FRPC.parse(binary);
+		if (type.indexOf("base64") > -1) { decoded = atob(decoded); }
+		var binary = decoded.split("").map(function(ch) { return ch.charCodeAt(0); })
+		this._response = FRPC.parse(binary);
 
-		this._cells[3].innerHTML = this._response.status;
+		this._cells[3].appendChild(document.createTextNode(this._response.status));
 
 		var button = document.createElement("button");
 		button.innerHTML = "Log to Console";
@@ -83,7 +77,7 @@ Item.prototype.setResponseData = function(data) {
 		button.addEventListener("click", this._showResponse.bind(this));
 
 	} catch (e) {
-		this._cells[5].innerHTML += " (" + e.message + ")";
+		this._cells[5].appendChild(document.createTextNode(" (" + e.message + ")"));
 	}
 }
 
@@ -108,12 +102,6 @@ Item.prototype._showResponse = function() {
 }
 
 Item.prototype._show = function(data) {
-	/*
-	var w = window.open();
-	var str = JSON.stringify(data, null, "  ");
-	str = str.replace(/</g, "&lt;");
-	w.document.body.innerHTML = "<pre>" + str + "</pre>";
-*/
 	target.window.console.log(data);
 	toolbox.selectTool("webconsole");
 }

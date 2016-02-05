@@ -18,18 +18,15 @@
     <script src="chrome://browser/content/devtools/theme-switching.js"/>
     <script src="tool.js"/>
     <script src="item.js"/>
-    <script src="jak.js"/>
-    <script src="base64.js"/>
     <script src="frpc.js"/>
   </head>
 
   <style>
-    tr { display:table-row; }
-    td { display:table-cell; padding:2px 3px;}
+    td { padding:2px 3px;}
     td:nth-child(2), td:nth-child(3), td:nth-child(4), button {
       text-align: center;
     }
-    button {
+    #clear {
       position: fixed;
       right: 0;
       bottom: 0;
@@ -50,7 +47,7 @@
       </thead>
       <tbody></tbody>
     </table>
-    <button>Clear</button>
+    <button id="clear">Clear</button>
   </body>
 
 </html>

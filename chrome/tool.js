@@ -11,7 +11,7 @@ const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
  */
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-let devtools = Cu.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools
+let devtools = Cu.import("resource://devtools/Loader.jsm", {}).devtools
 
 /**
  * Import files using `require` and `loader.lazyRequireGetter`. You should use
