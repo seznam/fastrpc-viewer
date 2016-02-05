@@ -10,14 +10,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource:///modules/devtools/gDevTools.jsm");
 
 /**
- * `osString` specifies the current operating system.
- * Go to https://developer.mozilla.org/docs/XPCOM_Interface_Reference/nsIXULRuntime
- * for more information.
- */
-XPCOMUtils.defineLazyGetter(this, "osString", () =>
-  Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS);
-
-/**
  * `toolStrings` is a bundle containing localized strings.
  * Go to https://developer.mozilla.org/docs/Localization for more information.
  */
@@ -35,14 +27,12 @@ XPCOMUtils.defineLazyGetter(this, "toolDefinition", () => ({
   // The position of the tool's tab within the toolbox
   ordinal: 99,
 
-  // Main keybinding modifiers.
-  modifiers: osString == "Darwin" ? "accel,alt" : "accel,shift",
 
   // The url of the icon, displayed in the Toolbox.
   icon: "chrome://browser/skin/devtools/tool-network.svg",
 
   // A tool lives in its own iframe. The Toolbox will load this URL.
-  url: "chrome://fastrpc/content/tool.xul",
+  url: "chrome://fastrpc/content/tool.xhtml",
 
   // The tool's name. Showed in Firefox' tool menu and in the Toolbox' tab.
   label: toolStrings.GetStringFromName("FastRPC.label"),
