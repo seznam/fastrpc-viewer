@@ -9,13 +9,13 @@
     <em:id>fastrpc@mozilla.com</em:id>
 
     <!-- A version string identifying the version of the add-on. -->
-    <em:version>0.6</em:version>
+    <em:version>0.7</em:version>
 
     <!-- The name of the add-on; intended for display in the UI. -->
     <em:name>FastRPC</em:name>
 
     <!-- A short description to display in the user interface. -->
-    <em:description>FastRPC decoder</em:description>
+    <em:description>Adds a new DevTools panel that shows FastRPC requests/responses</em:description>
 
     <!-- The name of the developer to display in the user interface. -->
     <em:creator>Ondřej Žára</em:creator>
@@ -30,7 +30,7 @@
         <!-- Mozilla Firefox -->
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>29.0a1</em:minVersion>
-        <em:maxVersion>32.0a1</em:maxVersion>
+        <em:maxVersion>99.0a1</em:maxVersion>
       </Description>
     </em:targetApplication>
 

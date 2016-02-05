@@ -1,6 +1,8 @@
 var Item = function(url) {
 	this._params = null;
 	this._response = null;
+	this._requestHeaders = null;
+	this._responseHeaders = null;
 
 	this._node = document.createElement("tr");
 	this._cells = [];
@@ -16,6 +18,7 @@ var Item = function(url) {
 Item.ALL = {};
 
 Item.prototype.setRequestHeaders = function(headers) {
+	this._requestHeaders = headers;
 	var type = this._getHeaderValue(headers, "Content-type");
 	if (type && type.match(/frpc/)) {
 		this._append();
@@ -30,8 +33,14 @@ Item.prototype.setRequestHeaders = function(headers) {
 
 Item.prototype.setRequestData = function(data) {
 	try {
-		var binary = JAK.Base64.atob(data);
+		var type = this._getHeaderValue(this._requestHeaders, "Content-type");
+		if (type.indexOf("base64") > -1) {
+			var binary = JAK.Base64.atob(data);
+		} else {
+			var binary = data.split("").map(function(ch) { return ch.charCodeAt(0); })
+		}
 		var result = JAK.FRPC.parse(binary);
+
 		this._cells[1].innerHTML = result.method;
 
 		this._params = result.params;
@@ -51,12 +60,19 @@ Item.prototype.setResponseStatus = function(status) {
 }
 
 Item.prototype.setResponseHeaders = function(headers) {
+	this._responseHeaders = headers;
 }
 
 Item.prototype.setResponseData = function(data) {
 	try {
+		var type = this._getHeaderValue(this._responseHeaders, "Content-type");
 		var decoded = atob(data); // brain-damaged ff re-encodes in base64...
-		var binary = JAK.Base64.atob(decoded);
+
+		if (type.indexOf("base64") > -1) {
+			var binary = JAK.Base64.atob(decoded);
+		} else {
+			var binary = decoded.split("").map(function(ch) { return ch.charCodeAt(0); })
+		}
 		this._response = JAK.FRPC.parse(binary);
 
 		this._cells[3].innerHTML = this._response.status;
