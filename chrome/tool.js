@@ -3,6 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
+
 /**
  * This file has access to the `window` and `document` objects of the add-on's
  * iframe, and is included in tool.xhtml. This is the add-on's controller.

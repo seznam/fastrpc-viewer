@@ -5,10 +5,6 @@
 
 const { require, loader } = Components.utils.import("resource://devtools/shared/Loader.jsm", {});
 
-this.EXPORTED_SYMBOLS = ["FastRPCPanel"];
-
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-
 const { Task } = require("resource://gre/modules/Task.jsm");
 loader.lazyRequireGetter(this, "Services");
 loader.lazyRequireGetter(this, "promise");
@@ -29,7 +25,7 @@ function FastRPCPanel(iframeWindow, toolbox) {
 };
 
 FastRPCPanel.prototype = {
-  get target() this._toolbox.target,
+  get target() this.toolbox.target,
 
   /**
    * Open is effectively an asynchronous constructor.
@@ -58,4 +54,4 @@ FastRPCPanel.prototype = {
   })
 };
 
-this.EXPORTED_SYMBOLS = ["MyAddonPanel"];
+this.EXPORTED_SYMBOLS = ["FastRPCPanel"];
