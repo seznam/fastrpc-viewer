@@ -3,8 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /* Go to https://developer.mozilla.org/docs/Tools/DevToolsColors
- * for the default colors used in Firefox Developer Tools */
+ * for the default colors used in Firefox Developer Tools. */
 
+<<<<<<< HEAD
 .theme-dark body {
 	color: #F5F7FA;
 }

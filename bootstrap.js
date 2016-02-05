@@ -35,9 +35,6 @@ XPCOMUtils.defineLazyGetter(this, "toolDefinition", () => ({
   // The position of the tool's tab within the toolbox
   ordinal: 99,
 
-  // Main keybinding key (used as a keyboard shortcut).
-  key: toolStrings.GetStringFromName("FastRPC.commandkey"),
-
   // Main keybinding modifiers.
   modifiers: osString == "Darwin" ? "accel,alt" : "accel,shift",
 

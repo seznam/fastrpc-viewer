@@ -3,16 +3,16 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
+const { require, loader } = Components.utils.import("resource://devtools/shared/Loader.jsm", {});
 
 this.EXPORTED_SYMBOLS = ["FastRPCPanel"];
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "EventEmitter",
-  "resource://gre/modules/devtools/event-emitter.js");
-XPCOMUtils.defineLazyModuleGetter(this, "promise",
-  "resource://gre/modules/commonjs/sdk/core/promise.js", "Promise");
+const { Task } = require("resource://gre/modules/Task.jsm");
+loader.lazyRequireGetter(this, "Services");
+loader.lazyRequireGetter(this, "promise");
+loader.lazyRequireGetter(this, "EventEmitter", "devtools/shared/event-emitter");
 
 /**
  * This is the add-on's panel, wrapping the tool's contents.
@@ -24,8 +24,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "promise",
  */
 function FastRPCPanel(iframeWindow, toolbox) {
   this.panelWin = iframeWindow;
-  this._toolbox = toolbox;
-
+  this.toolbox = toolbox;
   EventEmitter.decorate(this);
 };
 
@@ -39,13 +38,12 @@ FastRPCPanel.prototype = {
    * @return object
    *         A promise that is resolved when the tool completes opening.
    */
-  open: function() {
-    return this.panelWin.startup(this._toolbox, this.target).then(() => {
-      this.isReady = true;
-      this.emit("ready");
-      return this;
-    });
-  },
+  open: Task.async(function*() {
+    yield this.panelWin.startup(this.toolbox, this.target);
+    this.isReady = true;
+    this.emit("ready");
+    return this;
+  }),
 
   /**
    * Called when the user closes the toolbox or disables the add-on.
@@ -53,10 +51,11 @@ FastRPCPanel.prototype = {
    * @return object
    *         A promise that is resolved when the tool completes closing.
    */
-  destroy: function() {
-    return this.panelWin.shutdown().then(() => {
-      this.isReady = false;
-      this.emit("destroyed");
-    });
-  }
+  destroy: Task.async(function*() {
+    yield this.panelWin.shutdown();
+    this.isReady = false;
+    this.emit("destroyed");
+  })
 };
+
+this.EXPORTED_SYMBOLS = ["MyAddonPanel"];

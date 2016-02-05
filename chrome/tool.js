@@ -3,24 +3,34 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
-
+/**
+ * This file has access to the `window` and `document` objects of the add-on's
+ * iframe, and is included in tool.xhtml. This is the add-on's controller.
+ */
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 let devtools = Cu.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools
 
-XPCOMUtils.defineLazyModuleGetter(this, "EventEmitter",
-  "resource://gre/modules/devtools/event-emitter.js");
-XPCOMUtils.defineLazyModuleGetter(this, "promise",
-  "resource://gre/modules/commonjs/sdk/core/promise.js", "Promise");
+/**
+ * Import files using `require` and `loader.lazyRequireGetter`. You should use
+ * the latter for modules that aren't immediately needed.
+ */
 
 XPCOMUtils.defineLazyGetter(this, "toolStrings", () =>
   Services.strings.createBundle("chrome://fastrpc/locale/strings.properties"));
 
 /**
- * This file has access to the `window` and `document` objects of the add-on's
- * iframe, and is included in tool.xul. This is the add-on's controller.
+ * Define lazy getters for expensive IO using `loader.lazyGetter`.
  */
+loader.lazyGetter(this, "toolStrings", () => {
+  return Services.strings.createBundle("chrome://my-addon/locale/strings.properties");
+});
+
+/**
+ * DOM query helpers.
+ */
+const $ = (selector, target = document) => target.querySelector(selector);
+const $$ = (selector, target = document) => target.querySelectorAll(selector);
 
 var webConsoleClient = null;
 var target = null;
@@ -39,24 +49,6 @@ var toolbox = null;
 function startup(_toolbox, _target) {
 	target = _target;
 	toolbox = _toolbox;
-	/*
-  toolbox.selectTool("webconsole").then(function(webconsole) {
-
-	  var consoleEvent = {
-		ID: "jsm",
-		level: "log",
-		filename: "x",
-		lineNumber: "y",
-		functionName: "z",
-		timeStamp: Date.now(),
-		arguments: ["aaaaa", "bbbb"]
-	  };
-
-	  consoleEvent.wrappedJSObject = consoleEvent;
-
-	webconsole.hud.ui.logConsoleAPIMessage(consoleEvent);
-  });
-*/
 
   target.client.attachConsole(target.form.consoleActor, ["NetworkActivity"], function(response, _webConsoleClient) {
 	webConsoleClient = _webConsoleClient;
@@ -72,7 +64,6 @@ function startup(_toolbox, _target) {
 
   return promise.resolve();
 }
-
 /**
  * Called when the user closes the toolbox or disables the add-on.
  *
@@ -159,4 +150,3 @@ function onResponseContent(data) {
 		item && item.setResponseData(text);
 	}
 }
-
