@@ -9,7 +9,7 @@
     <em:id>fastrpc@mozilla.com</em:id>
 
     <!-- A version string identifying the version of the add-on. -->
-    <em:version>0.8</em:version>
+    <em:version>0.8.1</em:version>
 
     <!-- The name of the add-on; intended for display in the UI. -->
     <em:name>FastRPC</em:name>
