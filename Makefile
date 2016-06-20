@@ -1,5 +1,5 @@
 PROJECT="fastrpc-viewer"
-VERSION="0.8"
+VERSION="0.8.1"
 
 CURRENT_DIR=`pwd`
 BUILD_DIR="build"
