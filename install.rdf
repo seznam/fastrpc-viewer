@@ -23,6 +23,8 @@
     <!-- A link to the add-on home page to display in the user interface. -->
     <em:homepageURL>https://github.com/seznam/fastrpc-viewer</em:homepageURL>
 
+    <em:multiprocessCompatible>true</em:multiprocessCompatible>
+
     <!-- Target Application this extension can install into,
          with minimum and maximum supported versions. -->
     <em:targetApplication>
