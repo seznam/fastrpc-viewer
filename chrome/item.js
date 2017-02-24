@@ -94,14 +94,16 @@ Item.prototype._append = function() {
 }
 
 Item.prototype._showParams = function() {
-	this._show(this._params);
+	this._show("→", this._params);
 }
 
 Item.prototype._showResponse = function() {
-	this._show(this._response);
+	this._show("←", this._response);
 }
 
-Item.prototype._show = function(data) {
-	target.window.console.log(data);
+Item.prototype._show = function(prefix, data) {
+	let c = toolbox.getPanel("webconsole");
+	c.hud.ui.jsterm.requestEvaluation(`console.log(${JSON.stringify(prefix)}, ${JSON.stringify(data)})`);
+
 	toolbox.selectTool("webconsole");
 }

@@ -1,5 +1,5 @@
 PROJECT="fastrpc-viewer"
-VERSION="0.8.1"
+VERSION="0.9"
 
 CURRENT_DIR=`pwd`
 BUILD_DIR="build"
@@ -12,7 +12,7 @@ latest:
 	@echo "Building latest '${DIST_PATH}'..."
 	@mkdir -p ${BUILD_DIR}
 	@zip -r ${DIST_PATH} * -x "${BUILD_DIR}/*" -x "Makefile" -x ".git/*" -x "configure"
-
+	
 head:
 	@echo "Building '${DIST_PATH}'..."
 	@mkdir -p ${BUILD_DIR}

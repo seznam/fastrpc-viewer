@@ -7,7 +7,7 @@ const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource:///modules/devtools/gDevTools.jsm");
+Cu.import("resource://devtools/client/framework/gDevTools.jsm");
 
 /**
  * `toolStrings` is a bundle containing localized strings.
@@ -26,7 +26,6 @@ XPCOMUtils.defineLazyGetter(this, "toolDefinition", () => ({
 
   // The position of the tool's tab within the toolbox
   ordinal: 99,
-
 
   // The url of the icon, displayed in the Toolbox.
   icon: "chrome://devtools/skin/images/tool-network.svg",

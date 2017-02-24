@@ -11,7 +11,7 @@ const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
  */
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-let devtools = Cu.import("resource://devtools/Loader.jsm", {}).devtools
+let devtools = Cu.import("resource://devtools/shared/Loader.jsm").devtools
 
 /**
  * Import files using `require` and `loader.lazyRequireGetter`. You should use
@@ -49,8 +49,8 @@ var toolbox = null;
  *         A promise that should be resolved when the tool completes opening.
  */
 function startup(_toolbox, _target) {
-	target = _target;
 	toolbox = _toolbox;
+	target = _target;
 
   target.client.attachConsole(target.form.consoleActor, ["NetworkActivity"], function(response, _webConsoleClient) {
 	webConsoleClient = _webConsoleClient;
@@ -64,7 +64,7 @@ function startup(_toolbox, _target) {
 
   document.querySelector("button").addEventListener("click", onWillNavigate);
 
-  return promise.resolve();
+  return Promise.resolve();
 }
 /**
  * Called when the user closes the toolbox or disables the add-on.
@@ -73,7 +73,7 @@ function startup(_toolbox, _target) {
  *         A promise that should be resolved when the tool completes closing.
  */
 function shutdown() {
-  return promise.resolve();
+  return Promise.resolve();
 }
 
 function onWillNavigate() {

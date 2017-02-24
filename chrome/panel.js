@@ -25,7 +25,7 @@ function FastRPCPanel(iframeWindow, toolbox) {
 };
 
 FastRPCPanel.prototype = {
-  get target() this.toolbox.target,
+  get target() { return this.toolbox.target; },
 
   /**
    * Open is effectively an asynchronous constructor.
