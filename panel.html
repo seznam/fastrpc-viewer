@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+<!--
+		<link rel="stylesheet" href="chrome://devtools/content/shared/widgets/widgets.css" />
+		<link rel="stylesheet" href="chrome://devtools/skin/widgets.css" />
+-->
+		<link rel="stylesheet" href="resource://devtools/client/themes/common.css" />
+		<link rel="stylesheet" href="panel.css" />
+	</head>
+	<body>
+		<button>send</button>
+		<table>
+			<thead><tr>
+				<td>URL</td>
+				<td>Method</td>
+				<td>Params</td>
+				<td>HTTP</td>
+				<td>FRPC</td>
+				<td>Response</td>
+			</tr></thead>
+			<tbody></tbody>
+		</table>
+		<button id="clear">Clear</button>
+		<script src="fastrpc.js"></script>
+		<script src="panel.js"></script>
+	</body>
+</html>
