@@ -128,6 +128,10 @@ function onMessage(record) {
 	}
 }
 
+function syncTheme() {
+	document.body.dataset.theme = browser.devtools.panels.themeName
+}
+
 document.querySelector("form").onsubmit = async (e) => {
 	e.preventDefault();
 
@@ -152,6 +156,10 @@ document.querySelector("form").onsubmit = async (e) => {
 document.querySelector("#clear").onclick = () => {
 	tbody.innerHTML = "";
 }
+
+browser.devtools.panels.onThemeChanged.addListener(syncTheme);
+
+syncTheme();
 
 let port = browser.runtime.connect(null, {name: JSON.stringify(tabId)});
 port.onMessage.addListener(onMessage);
