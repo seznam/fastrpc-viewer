@@ -14,10 +14,6 @@ function getContentType(headers) {
 	return null;
 }
 
-function isFrpc(ct) {
-	return ct && ct.match(/-frpc/i);
-}
-
 function onBeforeRequest(request) {
 	let tabId = request.tabId;
 	let port = ports[tabId];
@@ -45,14 +41,7 @@ function onBeforeSendHeaders(request) {
 	if (!record) { return; }
 	delete requests[id];
 
-	let ct = getContentType(request.requestHeaders);
-
-	if (isFrpc(ct)) {
-		record.type = ct
-	} else {
-//		console.log("id", id, "is NOT frpc");
-	}
-
+	record.type = getContentType(request.requestHeaders);
 	ports[record.tabId].postMessage(record);
 }
 
@@ -66,17 +55,8 @@ function onHeadersReceived(request) {
 		id,
 		tabId,
 		status: request.statusCode,
-		type: null,
+		type: getContentType(request.responseHeaders),
 		body: null
-	}
-
-	let ct = getContentType(request.responseHeaders);
-
-	if (isFrpc(ct)) {
-//		console.log("response to", id, "is frpc");
-		record.type = ct;
-	} else {
-//		console.log("response to", id, "is NOT frpc");
 	}
 
 	port.postMessage(record);
