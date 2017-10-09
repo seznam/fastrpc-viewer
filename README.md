@@ -1,3 +1,3 @@
 # fastrpc-viewer
 
-Displays decoded FastRPC requests DevTools.
+Displays decoded FastRPC requests in DevTools.
