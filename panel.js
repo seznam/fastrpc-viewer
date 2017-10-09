@@ -45,7 +45,8 @@ function buttonOrValue(data) {
 	let str = JSON.stringify(data);
 	if (str.length > 60) {
 		let button = document.createElement("button");
-		button.innerHTML = (data instanceof Array ? `[${data.length}]` : `{${Object.keys(data).length}}`);
+		let str = (data instanceof Array ? `[${data.length}]` : `{${Object.keys(data).length}}`)
+		button.appendChild(document.createTextNode(str));
 		button.onclick = () => toConsole(data);
 		return button;
 	} else {
@@ -54,7 +55,7 @@ function buttonOrValue(data) {
 }
 
 function buildRequest(row, record) {
-	row.insertCell().innerHTML = record.url;
+	row.insertCell().appendChild(document.createTextNode(record.url));
 
 	let method = row.insertCell();
 
@@ -62,38 +63,39 @@ function buildRequest(row, record) {
 		let bytes = new Uint8Array(record.body);
 		try {
 			let data = parse(bytes, record.type);
-			method.innerHTML = data.method;
+			method.appendChild(document.createTextNode(data.method));
 			if (data.method == "system.multicall") { data.params = data.params[0]; }
 			let params = row.insertCell();
 			params.appendChild(buttonOrValue(data.params));
 		} catch (e) {
 			method.colSpan = 2;
-			method.innerHTML = e.message;
+			method.appendChild(document.createTextNode(e.message));
 		}
 	} else {
 		row.classList.add("no-frpc");
 		method.colSpan = 2;
-		method.innerHTML = "(not a FastRPC request)";
+		method.appendChild(document.createTextNode("(not a FastRPC request)"));
 	}
 }
 
 function buildResponse(row, record) {
-	row.insertCell().innerHTML = record.status;
+	row.insertCell().appendChild(document.createTextNode(record.status));
 	let frpcStatus = row.insertCell();
 
 	if (isFrpc(record.type)) {
 		let bytes = new Uint8Array(record.body);
 		try {
 			let data = parse(bytes, record.type);
-			frpcStatus.innerHTML = (data instanceof Array ? data.map(x => x.status).join("/") : data.status);
+			let str = (data instanceof Array ? data.map(x => x.status).join("/") : data.status);
+			frpcStatus.appendChild(document.createTextNode(str));
 			row.insertCell().appendChild(buttonOrValue(data));
 		} catch (e) {
 			frpcStatus.colSpan = 2;
-			frpcStatus.innerHTML = e.message;
+			frpcStatus.appendChild(document.createTextNode(e.message));
 		}
 	} else {
 		frpcStatus.colSpan = 2;
-		frpcStatus.innerHTML = "(not a FastRPC response)";
+		frpcStatus.appendChild(document.createTextNode("(not a FastRPC response)"));
 
 		if (row.classList.contains("no-frpc")) { row.parentNode.removeChild(row); } // frpc not in request nor response
 	}
