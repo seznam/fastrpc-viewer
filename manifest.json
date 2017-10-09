@@ -4,7 +4,8 @@
   "version": "1.0",
   "applications": {
     "gecko": {
-      "id": "fastrpc@mozilla.com"
+      "id": "fastrpc@mozilla.com",
+      "strict_min_version": "56.0"
     }
   },
 
