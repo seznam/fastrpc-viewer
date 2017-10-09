@@ -1,3 +1,7 @@
+body {
+	font: message-box;
+}
+
 table {
 	border-collapse: collapse;
 }
@@ -6,7 +10,11 @@ thead {
 	font-weight: bold;
 }
 
-td { padding:2px 3px; line-height: 1.5; }
+td {
+	padding:2px 3px;
+	line-height: 1.5;
+	white-space: nowrap;
+}
 
 td:nth-child(2), td:nth-child(3), td:nth-child(4), button {
 	text-align: center;
@@ -16,6 +24,11 @@ td:nth-child(2), td:nth-child(3), td:nth-child(4), button {
 	position: fixed;
 	right: 0;
 	bottom: 0;
+}
+
+td:first-child {
+	white-space: initial;
+	word-break: break-all;
 }
 
 tbody tr:nth-child(odd) {

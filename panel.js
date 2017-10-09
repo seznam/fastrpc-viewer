@@ -1,6 +1,7 @@
 const tbody = document.querySelector("tbody");
 const tabId = browser.devtools.inspectedWindow.tabId;
 let rows = {};
+let hashId = null;
 
 function isFrpc(ct) { return ct && ct.match(/-frpc/i); }
 
@@ -11,6 +12,7 @@ function send(url, method, args) {
 	xhr.responseType = "arraybuffer";
 	xhr.setRequestHeader("Accept", ct);
 	xhr.setRequestHeader("Content-Type", ct);
+	(hashId && xhr.setRequestHeader("X-Seznam-hashId", hashId));
 
 	let id = Math.random();
 	let body = new Uint8Array(fastrpc.serializeCall(method, args)).buffer;
@@ -20,11 +22,8 @@ function send(url, method, args) {
 
 	xhr.send(body);
 	xhr.addEventListener("load", e => {
-		let headers = xhr.getAllResponseHeaders();
-		let index = Object.keys(headers).map(h => h.toLowerCase()).findIndex(h => h.match(/content-type/i));
-		let type = Object.values(headers)[index] || "";
-
-		let responseRecord = { id, type, body, status: xhr.status };
+		let type = xhr.getResponseHeader("Content-type");
+		let responseRecord = { id, type, body:xhr.response, status: xhr.status };
 		onMessage(responseRecord);
 	});
 }
@@ -58,7 +57,6 @@ function buildRequest(row, record) {
 	row.insertCell().innerHTML = record.url;
 
 	let method = row.insertCell();
-	let params = row.insertCell();
 
 	if (isFrpc(record.type)) {
 		let bytes = new Uint8Array(record.body);
@@ -66,18 +64,39 @@ function buildRequest(row, record) {
 			let data = parse(bytes, record.type);
 			method.innerHTML = data.method;
 			if (data.method == "system.multicall") { data.params = data.params[0]; }
+			let params = row.insertCell();
 			params.appendChild(buttonOrValue(data.params));
 		} catch (e) {
+			method.colSpan = 2;
 			method.innerHTML = e.message;
-			console.log(bytes);
 		}
 	} else {
+		row.classList.add("no-frpc");
+		method.colSpan = 2;
 		method.innerHTML = "(not a FastRPC request)";
 	}
 }
 
 function buildResponse(row, record) {
 	row.insertCell().innerHTML = record.status;
+	let frpcStatus = row.insertCell();
+
+	if (isFrpc(record.type)) {
+		let bytes = new Uint8Array(record.body);
+		try {
+			let data = parse(bytes, record.type);
+			frpcStatus.innerHTML = (data instanceof Array ? data.map(x => x.status).join("/") : data.status);
+			row.insertCell().appendChild(buttonOrValue(data));
+		} catch (e) {
+			frpcStatus.colSpan = 2;
+			frpcStatus.innerHTML = e.message;
+		}
+	} else {
+		frpcStatus.colSpan = 2;
+		frpcStatus.innerHTML = "(not a FastRPC response)";
+
+		if (row.classList.contains("no-frpc")) { row.parentNode.removeChild(row); } // frpc not in request nor response
+	}
 }
 
 /**
@@ -88,6 +107,7 @@ function buildResponse(row, record) {
  * @param {null||ArrayBuffer} record.body
  * @param {number} [record.status]
  * @param {string} [record.url]
+ * @param {string} [record.hashId]
  */
 function onMessage(record) {
 	let id = record.id;
@@ -101,6 +121,7 @@ function onMessage(record) {
 		rows[id] = row;
 
 		buildRequest(row, record);
+		if (record.hashId) { hashId = record.hashId; }
 
 		let node = document.documentElement;
 		node.scrollTop = node.scrollHeight;
