@@ -37,7 +37,7 @@ function parse(bytes, ct) {
 }
 
 function toConsole(data) {
-	let cmd = `console.log(${JSON.stringify(data)})`;
+	let cmd = `inspect(${JSON.stringify(data)})`;
 	browser.devtools.inspectedWindow.eval(cmd);
 }
 
