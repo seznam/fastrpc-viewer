@@ -1,5 +1,5 @@
 body {
-	font: message-box;
+	font: caption;
 }
 
 table {
@@ -13,7 +13,7 @@ thead {
 td {
 	padding:2px 3px;
 	line-height: 1.5;
-	white-space: nowrap;
+	xwhite-space: nowrap;
 }
 
 td:nth-child(2), td:nth-child(3), td:nth-child(4), button {
@@ -33,6 +33,10 @@ td:first-child {
 
 tbody tr:nth-child(odd) {
 	background-color: rgba(0, 0, 0, 0.1);
+}
+
+tbody td:first-child {
+	cursor: help;
 }
 
 [data-theme=dark] {

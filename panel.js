@@ -55,9 +55,8 @@ function buttonOrValue(data) {
 }
 
 function buildRequest(row, record) {
-	row.insertCell().appendChild(document.createTextNode(record.url));
-
 	let method = row.insertCell();
+	method.title = record.url;
 
 	if (isFrpc(record.type)) {
 		let bytes = new Uint8Array(record.body);
