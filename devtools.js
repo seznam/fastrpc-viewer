@@ -1,1 +1,1 @@
-browser.devtools.panels.create("FastRPC", "chrome://devtools/skin/images/tool-network.svg", "panel.html");
+browser.devtools.panels.create("FastRPC", "icon.svg", "panel.html");
