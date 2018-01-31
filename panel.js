@@ -78,6 +78,14 @@ function buildRequest(row, record) {
 }
 
 function buildResponse(row, record) {
+	if (record.error) {
+		let errorCell = row.insertCell();
+		errorCell.appendChild(document.createTextNode(record.error));
+		errorCell.colSpan = 3;
+		row.appendChild(errorCell);
+		return;
+	}
+
 	row.insertCell().appendChild(document.createTextNode(record.status));
 	let frpcStatus = row.insertCell();
 
@@ -117,7 +125,7 @@ function onMessage(record) {
 	if (row) { /* response */
 		buildResponse(row, record);
 		delete rows[id];
-	} else { /* request */
+	} else if (!record.error) { /* request */
 		let row = tbody.insertRow();
 		rows[id] = row;
 

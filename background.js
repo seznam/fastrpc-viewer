@@ -39,7 +39,8 @@ function onBeforeRequest(request) {
 
 	let body = request.requestBody;
 	if (body) { body = body.raw[0].bytes; }
-	let record = {
+
+	requests[id] = {
 		id,
 		tabId,
 		type: null,
@@ -47,7 +48,11 @@ function onBeforeRequest(request) {
 		body
 	}
 
-	requests[id] = record;
+	responses[id] = {
+		id,
+		tabId,
+		body: null
+	};
 //	console.log("got id", id, "to", request.url);
 }
 
@@ -70,31 +75,47 @@ function onHeadersReceived(request) {
 	if (!port) { return; } // no devtool avail, sorry
 
 	let id = request.requestId;
-	let record = {
-		id,
-		tabId,
-		status: request.statusCode,
-		type: getContentType(request.responseHeaders),
-		body: null
-	}
+	let record = responses[id];
+	record.status = request.statusCode;
+	record.type = getContentType(request.responseHeaders);
 
-	responses[id] = record;
+	finalizeResponse(id); // wait for body or send to devtool
 }
 
 function onResponseBody(id, body) {
 	let record = responses[id];
+	record.body = body;
+
+	finalizeResponse(id); // wait for headers or send to devtool
+}
+
+function onErrorOccurred(details) {
+	let id = details.requestId;
+	delete requests[id];
+	delete responses[id];
+
+	let record = {
+		id,
+		error: details.error
+	}
+	ports[details.tabId].postMessage(record);
+}
+
+function finalizeResponse(id) {
+	let record = responses[id];
+	if (!record.body || !record.type) { return; }
+
 	delete responses[id];
 
 	let tabId = record.tabId;
 	let port = ports[tabId];
-
-	record.body = body;
 	port.postMessage(record);
 }
 
 browser.webRequest.onBeforeRequest.addListener(onBeforeRequest, filter, ["requestBody", "blocking"]);
 browser.webRequest.onBeforeSendHeaders.addListener(onBeforeSendHeaders, filter, ["requestHeaders"]);
 browser.webRequest.onHeadersReceived.addListener(onHeadersReceived, filter, ["responseHeaders"]);
+browser.webRequest.onErrorOccurred.addListener(onErrorOccurred, filter);
 
 browser.runtime.onConnect.addListener(p => {
 	let tabId = JSON.parse(p.name);
