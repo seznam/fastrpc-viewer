@@ -79,6 +79,7 @@ function buildRequest(row, record) {
 
 function buildResponse(row, record) {
 	if (record.error) {
+		row.classList.add("error"); // http error
 		let errorCell = row.insertCell();
 		errorCell.appendChild(document.createTextNode(record.error));
 		errorCell.colSpan = 3;
@@ -86,6 +87,7 @@ function buildResponse(row, record) {
 		return;
 	}
 
+	if (record.status != 200) { row.classList.add("error"); } // non-200 http
 	row.insertCell().appendChild(document.createTextNode(record.status));
 	let frpcStatus = row.insertCell();
 
@@ -93,10 +95,18 @@ function buildResponse(row, record) {
 		let bytes = new Uint8Array(record.body);
 		try {
 			let data = parse(bytes, record.type);
-			let str = (data instanceof Array ? data.map(x => x.status).join("/") : data.status);
+			let str;
+			if (data instanceof Array) {
+				if (data.some(x => x.status != 200)) { row.classList.add("error"); } // non-200 frpc multicall
+				str = data.map(x => x.status).join("/");
+			} else {
+				if (data.status != 200) { row.classList.add("error"); } // non-200 frpc singlecall
+				str = data.status;
+			}
 			frpcStatus.appendChild(document.createTextNode(str));
 			row.insertCell().appendChild(buttonOrValue(data));
 		} catch (e) {
+			row.classList.add("error");
 			frpcStatus.colSpan = 2;
 			frpcStatus.appendChild(document.createTextNode(e.message));
 		}
