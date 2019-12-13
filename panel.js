@@ -1,3 +1,5 @@
+import * as fastrpc from "./fastrpc.js";
+
 const tbody = document.querySelector("tbody");
 const tabId = browser.devtools.inspectedWindow.tabId;
 let rows = {};
@@ -30,7 +32,8 @@ function send(url, method, args) {
 
 function parse(bytes, ct) {
 	if (ct.match(/base64/i)) {
-		let str = String.fromCharCode(...bytes);
+		let str = "";
+		bytes.forEach(b => str += String.fromCharCode(b));
 		bytes = atob(str).split("").map(x => x.charCodeAt(0));
 	}
 	return fastrpc.parse(bytes);
