@@ -3,5 +3,9 @@
   "name": "FastRPC",
   "version": "2.0",
   "description": "Adds a DevTools panel for decoding FastRPC requests.",
-  "devtools_page": "devtools.html"
+  "devtools_page": "devtools.html",
+  "icons": {
+  	"48": "icon.svg",
+  	"128": "icon.svg"
+  }
 }
