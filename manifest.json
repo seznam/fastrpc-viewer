@@ -1,22 +1,7 @@
 {
   "manifest_version": 2,
   "name": "FastRPC",
-  "version": "1.7",
-  "applications": {
-    "gecko": {
-      "id": "fastrpc@mozilla.com",
-      "strict_min_version": "60.0"
-    }
-  },
-
+  "version": "2.0",
   "description": "Adds a DevTools panel for decoding FastRPC requests.",
-  "devtools_page": "devtools.html",
-  "permissions": [
-    "webRequest",
-    "webRequestBlocking",
-    "<all_urls>"
-  ],
-  "background": {
-    "scripts": ["background.js"]
-  }
+  "devtools_page": "devtools.html"
 }

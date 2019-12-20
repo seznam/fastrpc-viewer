@@ -1,2 +1,2 @@
 dev:
-	web-ext run --bc -u "http://ondra.dev.dszn.cz:2880/"
+	web-ext run -u "https://mapy.cz/"

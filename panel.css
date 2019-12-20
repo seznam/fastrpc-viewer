@@ -1,5 +1,6 @@
 body {
-	font: caption;
+	font-family: sans-serif;
+	font-size: 12px;
 }
 
 table {
@@ -13,10 +14,13 @@ thead {
 td {
 	padding:2px 3px;
 	line-height: 1.5;
-	xwhite-space: nowrap;
 }
 
-td:nth-child(2), td:nth-child(3), td:nth-child(4), button {
+button {
+	padding: 0;
+}
+
+td:nth-child(3), td:nth-child(4), button {
 	text-align: center;
 }
 
@@ -47,6 +51,15 @@ tbody td:first-child {
 	background-color: rgba(255, 255, 255, 0.1);
 }
 
+.empty td {
+	border-top: 3px double currentColor;
+}
+
 .error {
 	color: red;
+}
+
+.clipboard {
+	cursor: pointer;
+	margin-right: 4px;
 }

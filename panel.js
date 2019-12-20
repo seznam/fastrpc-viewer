@@ -1,11 +1,68 @@
 import * as fastrpc from "./fastrpc.js";
 
+const devtools = (window.browser ? browser : chrome).devtools;
 const tbody = document.querySelector("tbody");
-const tabId = browser.devtools.inspectedWindow.tabId;
-let rows = {};
 let hashId = null;
 
 function isFrpc(ct) { return ct && ct.match(/-frpc/i); }
+
+async function getContent(har) {
+	let ffPromise;
+	let chromePromise = new Promise(resolve => {
+		ffPromise = har.getContent((content, encoding) => resolve([content, encoding]));
+	});
+
+	let [content, encoding] = await (ffPromise || chromePromise);
+	return atob(content);
+}
+
+function createClipButton(data) {
+	let node = document.createElement("span");
+	node.className = "clipboard";
+	node.title = "Copy to clipboard";
+	node.textContent = "📋";
+	node.addEventListener("click", e => {
+		let str = (typeof(data) == "string" ? data : JSON.stringify(data));
+		navigator.clipboard.writeText(str);
+	});
+	return node;
+}
+
+function stringToBytes(str, ct) {
+	if (ct.match(/base64/i)) {
+		return atob(str).split("").map(x => x.charCodeAt(0));
+	} else {
+		let bytes = new Uint8Array(str.length);
+		return str.split("").map(x => x.charCodeAt(0));
+	}
+}
+
+function xhrToHar(xhr, url, body, ct) {
+	let text = "";
+	body.forEach(byte => text += String.fromCharCode(byte));
+	let responseMimeType = xhr.getResponseHeader("Content-type");
+
+	return {
+		getContent() {
+			let text = "";
+			new Uint8Array(xhr.response).forEach(byte => text += String.fromCharCode(byte));
+			return [btoa(text), responseMimeType];
+		},
+		request: {
+			url,
+			postData: {
+				mimeType: ct,
+				text
+			}
+		},
+		response: {
+			status: xhr.status,
+			content: {
+				mimeType: responseMimeType
+			}
+		}
+	};
+}
 
 function send(url, method, args) {
 	const ct ="application/x-frpc";
@@ -16,32 +73,18 @@ function send(url, method, args) {
 	xhr.setRequestHeader("Content-Type", ct);
 	(hashId && xhr.setRequestHeader("X-Seznam-hashId", hashId));
 
-	let id = Math.random();
-	let body = new Uint8Array(fastrpc.serializeCall(method, args)).buffer;
-
-	let requestRecord = { id, url, type: ct, body };
-	onMessage(requestRecord);
-
+	let body = new Uint8Array(fastrpc.serializeCall(method, args));
 	xhr.send(body);
 	xhr.addEventListener("load", e => {
-		let type = xhr.getResponseHeader("Content-type");
-		let responseRecord = { id, type, body:xhr.response, status: xhr.status };
-		onMessage(responseRecord);
+		let har = xhrToHar(xhr, url, body, ct);
+		buildRow(har);
 	});
 }
 
-function parse(bytes, ct) {
-	if (ct.match(/base64/i)) {
-		let str = "";
-		bytes.forEach(b => str += String.fromCharCode(b));
-		bytes = atob(str).split("").map(x => x.charCodeAt(0));
-	}
-	return fastrpc.parse(bytes);
-}
-
 function toConsole(data) {
-	let cmd = `inspect(${JSON.stringify(data)})`;
-	browser.devtools.inspectedWindow.eval(cmd);
+	let method = (window.browser ? "inspect" : "console.log");
+	let cmd = `${method}(${JSON.stringify(data)})`;
+	devtools.inspectedWindow.eval(cmd);
 }
 
 function buttonOrValue(data) {
@@ -57,101 +100,13 @@ function buttonOrValue(data) {
 	}
 }
 
-function buildRequest(row, record) {
-	let method = row.insertCell();
-	method.title = record.url;
-
-	if (isFrpc(record.type)) {
-		let bytes = new Uint8Array(record.body);
-		try {
-			let data = parse(bytes, record.type);
-			method.appendChild(document.createTextNode(data.method));
-			if (data.method == "system.multicall") { data.params = data.params[0]; }
-			let params = row.insertCell();
-			params.appendChild(buttonOrValue(data.params));
-		} catch (e) {
-			method.colSpan = 2;
-			method.appendChild(document.createTextNode(e.message));
-		}
-	} else {
-		row.classList.add("no-frpc");
-		method.colSpan = 2;
-		method.appendChild(document.createTextNode("(not a FastRPC request)"));
-	}
-}
-
-function buildResponse(row, record) {
-	if (record.error) {
-		row.classList.add("error"); // http error
-		let errorCell = row.insertCell();
-		errorCell.appendChild(document.createTextNode(record.error));
-		errorCell.colSpan = 3;
-		row.appendChild(errorCell);
-		return;
-	}
-
-	if (record.status != 200) { row.classList.add("error"); } // non-200 http
-	row.insertCell().appendChild(document.createTextNode(record.status));
-	let frpcStatus = row.insertCell();
-
-	if (isFrpc(record.type)) {
-		let bytes = new Uint8Array(record.body);
-		try {
-			let data = parse(bytes, record.type);
-			let str;
-			if (data instanceof Array) {
-				if (data.some(x => x.status != 200)) { row.classList.add("error"); } // non-200 frpc multicall
-				str = data.map(x => x.status).join("/");
-			} else {
-				if (data.status != 200) { row.classList.add("error"); } // non-200 frpc singlecall
-				str = data.status;
-			}
-			frpcStatus.appendChild(document.createTextNode(str));
-			row.insertCell().appendChild(buttonOrValue(data));
-		} catch (e) {
-			row.classList.add("error");
-			frpcStatus.colSpan = 2;
-			frpcStatus.appendChild(document.createTextNode(e.message));
-		}
-	} else {
-		frpcStatus.colSpan = 2;
-		frpcStatus.appendChild(document.createTextNode("(not a FastRPC response)"));
-
-		if (row.classList.contains("no-frpc")) { row.parentNode.removeChild(row); } // frpc not in request nor response
-	}
-}
-
-/**
- * @param {object} record
- * @param {string} record.id
- * @param {string} record.tabId
- * @param {null||string} record.type
- * @param {null||ArrayBuffer} record.body
- * @param {number} [record.status]
- * @param {string} [record.url]
- * @param {string} [record.hashId]
- */
-function onMessage(record) {
-	let id = record.id;
-	let row = rows[id];
-
-	if (row) { /* response */
-		buildResponse(row, record);
-		delete rows[id];
-	} else if (!record.error) { /* request */
-		let row = tbody.insertRow();
-		rows[id] = row;
-
-		buildRequest(row, record);
-		if (record.hashId) { hashId = record.hashId; }
-
-		let node = document.documentElement;
-		node.scrollTop = node.scrollHeight;
-	}
+function alert(what) {
+	let cmd = `alert(${JSON.stringify(what)})`;
+	devtools.inspectedWindow.eval(cmd);
 }
 
 function syncTheme() {
-	document.body.dataset.theme = browser.devtools.panels.themeName
+	document.body.dataset.theme = devtools.panels.themeName;
 }
 
 document.querySelector("form").onsubmit = async (e) => {
@@ -169,7 +124,7 @@ document.querySelector("form").onsubmit = async (e) => {
 	} catch (e) { return alert(e.message); }
 
 
-	let base = await browser.devtools.inspectedWindow.eval("location.href");
+	let base = await devtools.inspectedWindow.eval("location.href");
 	let url = new URL("/RPC2", base);
 
 	send(url.toString(), method, args);
@@ -179,9 +134,95 @@ document.querySelector("#clear").onclick = () => {
 	tbody.innerHTML = "";
 }
 
-browser.devtools.panels.onThemeChanged.addListener(syncTheme);
+function buildRow(har) {
+	let row = tbody.insertRow();
+	buildRequest(row, har.request);
+	buildResponse(row, har.response, har);
+}
 
+function buildRequest(row, request) {
+	let method = row.insertCell();
+	method.title = request.url;
+
+	if (request.postData && isFrpc(request.postData.mimeType)) {
+		try {
+			let bytes = stringToBytes(request.postData.text, request.postData.mimeType);
+			let data = fastrpc.parse(bytes);
+			method.appendChild(createClipButton(data.method));
+			method.appendChild(document.createTextNode(data.method));
+			if (data.method == "system.multicall") { data.params = data.params[0]; }
+			let params = row.insertCell();
+			params.appendChild(createClipButton(data.params));
+			params.appendChild(buttonOrValue(data.params));
+		} catch (e) {
+			method.colSpan = 2;
+			method.appendChild(document.createTextNode(e.message));
+		}
+	} else {
+		row.classList.add("no-frpc");
+		method.colSpan = 2;
+		method.appendChild(document.createTextNode("(not a FastRPC request)"));
+	}
+}
+
+async function buildResponse(row, response, har) {
+	if (response.status != 200) { row.classList.add("error"); } // non-200 http
+	row.insertCell().appendChild(document.createTextNode(response.status));
+	let frpcStatus = row.insertCell();
+
+	if (isFrpc(response.content.mimeType)) {
+		let content = await getContent(har);
+		try {
+			let bytes = stringToBytes(content, response.content.mimeType);
+			let data = fastrpc.parse(bytes);
+			let str;
+			if (data instanceof Array) {
+				if (data.some(x => x.status != 200)) { row.classList.add("error"); } // non-200 frpc multicall
+				str = data.map(x => x.status).join("/");
+			} else {
+				if (data.status != 200) { row.classList.add("error"); } // non-200 frpc singlecall
+				str = data.status;
+			}
+			frpcStatus.appendChild(document.createTextNode(str));
+			let td = row.insertCell();
+			td.appendChild(createClipButton(data));
+			td.appendChild(buttonOrValue(data));
+		} catch (e) {
+			row.classList.add("error");
+			frpcStatus.colSpan = 2;
+			frpcStatus.appendChild(document.createTextNode(e.message));
+		}
+	} else {
+		frpcStatus.colSpan = 2;
+		frpcStatus.appendChild(document.createTextNode("(not a FastRPC response)"));
+	}
+}
+
+function onRequestFinished(har) {
+	let { request, response } = har;
+
+	request.headers.forEach(header => {
+		if (header.name.match(/X-Seznam-hashId/i)) { hashId = header.value; }
+	});
+
+
+	let requestOk = (request.postData && isFrpc(request.postData.mimeType));
+	let responseOk = isFrpc(response.content.mimeType);
+
+	if (requestOk || responseOk) { buildRow(har); }
+}
+
+function onNavigated() {
+	let rows = tbody.querySelectorAll("tr").length;
+	if (rows > 0) {
+		let empty = tbody.insertRow();
+		empty.className = "empty";
+		let td = empty.insertCell();
+		td.colSpan = 5;
+	}
+}
+
+devtools.network.onRequestFinished && devtools.network.onRequestFinished.addListener(onRequestFinished);
+devtools.network.onNavigated && devtools.network.onNavigated.addListener(onNavigated);
+devtools.panels.onThemeChanged && devtools.panels.onThemeChanged.addListener(syncTheme);
 syncTheme();
-
-let port = browser.runtime.connect(null, {name: JSON.stringify(tabId)});
-port.onMessage.addListener(onMessage);
