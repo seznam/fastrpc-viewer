@@ -1,9 +1,11 @@
 {
   "manifest_version": 2,
   "name": "FastRPC",
-  "version": "2.0",
+  "version": "2.1",
   "description": "This DevTools extension adds another panel that shows decoded FastRPC requests. Works for both requests and responses and can be used to copy request/response data to clipboard. Implements the FastRPC protocol (https://github.com/seznam/fastrpc/wiki/FastRPC-binary-protocol-specification) v1, v2 and v3. The extension also works in Firefox and is already available at MozAddons: https://addons.mozilla.org/cs/firefox/addon/fastrpc/",
   "devtools_page": "devtools.html",
+  "author": "Ondřej Žára <ondrej.zara@firma.seznam.cz>",
+  "homepage_url": "https://github.com/seznam/fastrpc-viewer",
   "icons": {
   	"48": "icon.svg",
   	"128": "icon.svg"
