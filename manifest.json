@@ -7,7 +7,7 @@
   "author": "Ondřej Žára <ondrej.zara@firma.seznam.cz>",
   "homepage_url": "https://github.com/seznam/fastrpc-viewer",
   "icons": {
-  	"48": "icon.svg",
-  	"128": "icon.svg"
+  	"48": "icon-48.svg",
+  	"128": "icon-128.svg"
   }
 }
