@@ -1,11 +1,12 @@
 {
   "manifest_version": 2,
   "name": "FastRPC",
-  "version": "2.2",
+  "version": "2.4",
   "description": "This DevTools extension adds another panel that shows decoded FastRPC (protocol v1, v2, v3) requests and responses.",
   "devtools_page": "devtools.html",
   "author": "Ondřej Žára <ondrej.zara@firma.seznam.cz>",
   "homepage_url": "https://github.com/seznam/fastrpc-viewer",
+  "permissions": ["<all_urls>", "tabs"],
   "icons": {
   	"48": "icon-48.png",
   	"128": "icon-128.png"

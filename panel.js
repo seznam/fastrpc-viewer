@@ -1,10 +1,22 @@
 import * as fastrpc from "./fastrpc.js";
 
 const devtools = (window.browser ? browser : chrome).devtools;
+const tabs = (window.browser ? browser : chrome).tabs;
 const tbody = document.querySelector("tbody");
 let hashId = null;
 
 function isFrpc(ct) { return ct && ct.match(/-frpc/i); }
+
+async function getUrl() {
+	if (tabs) {
+		let id = devtools.inspectedWindow.tabId;
+		return new Promise(resolve => {
+			tabs.get(id, tab => resolve(tab.url));
+		});
+	} else {
+		return devtools.inspectedWindow.eval("location.href");
+	}
+}
 
 async function getContent(har) {
 	let ffPromise;
@@ -124,7 +136,7 @@ document.querySelector("form").onsubmit = async (e) => {
 	} catch (e) { return alert(e.message); }
 
 
-	let base = await devtools.inspectedWindow.eval("location.href");
+	let base = await getUrl();
 	let url = new URL("/RPC2", base);
 
 	send(url.toString(), method, args);
